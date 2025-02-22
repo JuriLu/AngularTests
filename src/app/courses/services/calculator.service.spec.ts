@@ -12,16 +12,17 @@ describe('CalculatorService', () => {
 
         console.log("Calling beforeEach");
 
-        loggerSpy = jasmine.createSpyObj('LoggerService', ["log"]);
+        loggerSpy = jasmine.createSpyObj('LoggerService', ["log"]); // complete fake implemetation of a logger service. This is an object
+                                                                    // created by Jasmine that contains only one method called "log"
 
-        TestBed.configureTestingModule({
+        TestBed.configureTestingModule({   // Testbed makes possible to inject the service in the service, to make possible to also use DI on testing
             providers: [
                 CalculatorService,
                 {provide: LoggerService, useValue: loggerSpy}
             ]
         });
 
-        calculator = TestBed.inject(CalculatorService);
+        calculator = TestBed.inject(CalculatorService);  // Injection of Calculator Service
 
     });
 
@@ -33,7 +34,7 @@ describe('CalculatorService', () => {
 
         expect(result).toBe(4);
 
-        expect(loggerSpy.log).toHaveBeenCalledTimes(1);
+        expect(loggerSpy.log).toHaveBeenCalledTimes(1); //See how many times, did the log function get called
 
     });
 
