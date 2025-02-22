@@ -44,7 +44,7 @@ describe('CalculatorService', () => {
 
         const result = calculator.subtract(2, 2);
 
-        expect(result).toBe(0, "unexpected subtraction result");
+        expect(result).withContext("unexpected subtraction result").toBe(0);
 
         expect(loggerSpy.log).toHaveBeenCalledTimes(1);
 
