@@ -3,6 +3,8 @@ import {CoursesService} from "./courses.service";
 import {HttpTestingController, provideHttpClientTesting} from "@angular/common/http/testing";
 import {COURSES} from "../../../../server/db-data";
 import {provideHttpClient} from "@angular/common/http";
+import {Course} from "../model/course";
+import {extractJsDocDescription} from "@angular/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor";
 
 describe("CoursesService", () => {
   let coursesService: CoursesService,
@@ -50,6 +52,23 @@ describe("CoursesService", () => {
     const req = httpTestingController.expectOne('/api/courses/12')   //Mock request
     expect(req.request.method).toBe('GET');
     req.flush(COURSES[12]) //Pass some data to our mock request, pass the data return
+
+  })
+
+  it('should save a course data', () => {
+    const changes:Partial<Course> = {titles: {description: "Testing Course"}};
+
+    coursesService.saveCourse(12,changes).subscribe(course => {
+      expect(course.id).withContext('Incorrect course id').toBe(12);
+    });
+
+    const req = httpTestingController.expectOne('/api/courses/12')   //Mock request
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body.titles.description).withContext('Description not the same as in changes').toBe(changes.titles.description);
+    req.flush({
+      ...COURSES[12],
+      ...changes
+    }) //Pass some data to our mock request, pass the data return
 
   })
 
