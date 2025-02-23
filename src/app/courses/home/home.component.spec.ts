@@ -50,6 +50,18 @@ describe('HomeComponent', () => {
   })
 
   it('should display only advanced courses', () => {
-
+    coursesService.findAllCourses.and.returnValue(of(advancedCourses))
+    fixture.detectChanges();
+    const tabs = el.queryAll(By.css('.mdc-tab'))
+    expect(tabs.length).withContext('Unexpected number of tabs found').toBe(1);
   })
+
+  it('should display both tabs', () => {
+    coursesService.findAllCourses.and.returnValue(of(setupCourses()))
+    fixture.detectChanges();
+    const tabs = el.queryAll(By.css('.mdc-tab'))
+    expect(tabs.length).withContext('Expected to find 2 tabs').toBe(2);
+  })
+
+
 })
