@@ -2,7 +2,7 @@ import {TestBed} from "@angular/core/testing";
 import {CoursesService} from "./courses.service";
 import {HttpTestingController, provideHttpClientTesting} from "@angular/common/http/testing";
 import {COURSES} from "../../../../server/db-data";
-import {provideHttpClient} from "@angular/common/http";
+import {HttpErrorResponse, provideHttpClient} from "@angular/common/http";
 import {Course} from "../model/course";
 import {extractJsDocDescription} from "@angular/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor";
 
@@ -56,9 +56,9 @@ describe("CoursesService", () => {
   })
 
   it('should save a course data', () => {
-    const changes:Partial<Course> = {titles: {description: "Testing Course"}};
+    const changes: Partial<Course> = {titles: {description: "Testing Course"}};
 
-    coursesService.saveCourse(12,changes).subscribe(course => {
+    coursesService.saveCourse(12, changes).subscribe(course => {
       expect(course.id).withContext('Incorrect course id').toBe(12);
     });
 
@@ -72,7 +72,21 @@ describe("CoursesService", () => {
 
   })
 
-  afterEach(()=>{
+  it('should give an error if save course fails', () => {
+    const changes: Partial<Course> = {titles: {description: "Testing Course"}};
+
+    coursesService.saveCourse(12, changes).subscribe(
+      () => fail("The save course operation should have failed"),
+      (error: HttpErrorResponse) => expect(error.status).toBe(500)
+    )
+
+    const req = httpTestingController.expectOne('/api/courses/12')   //Mock request
+    expect(req.request.method).toBe('PUT');
+    req.flush('Save Course Failed',{status:500,statusText:'Internal Server Error'}) //Pass some data to our mock request, pass the data return
+
+  })
+
+  afterEach(() => {
     httpTestingController.verify() // Verify that no other call is being made after the finish of each call
   })
 
