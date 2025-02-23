@@ -37,4 +37,24 @@ describe("CoursesService", () => {
     req.flush({payload: Object.values(COURSES)}) //Pass some data to our mock request, pass the data return
 
   })
+
+  it('should find a course by id', () => {
+
+    coursesService.findCourseById(12).subscribe(course => {
+      expect(course).withContext('No course returned').toBeTruthy()
+      expect(course.id).withContext('Incorrect course id').toBe(12);
+
+      expect(course.titles.description).toBe("Angular Testing Course")
+    });
+
+    const req = httpTestingController.expectOne('/api/courses/12')   //Mock request
+    expect(req.request.method).toBe('GET');
+    req.flush(COURSES[12]) //Pass some data to our mock request, pass the data return
+
+  })
+
+  afterEach(()=>{
+    httpTestingController.verify() // Verify that no other call is being made after the finish of each call
+  })
+
 })
