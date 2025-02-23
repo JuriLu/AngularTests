@@ -1,7 +1,7 @@
 import {TestBed} from "@angular/core/testing";
 import {CoursesService} from "./courses.service";
 import {HttpTestingController, provideHttpClientTesting} from "@angular/common/http/testing";
-import {COURSES} from "../../../../server/db-data";
+import {COURSES, findLessonsForCourse} from "../../../../server/db-data";
 import {HttpErrorResponse, provideHttpClient} from "@angular/common/http";
 import {Course} from "../model/course";
 import {extractJsDocDescription} from "@angular/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor";
@@ -82,7 +82,28 @@ describe("CoursesService", () => {
 
     const req = httpTestingController.expectOne('/api/courses/12')   //Mock request
     expect(req.request.method).toBe('PUT');
-    req.flush('Save Course Failed',{status:500,statusText:'Internal Server Error'}) //Pass some data to our mock request, pass the data return
+    req.flush('Save Course Failed', {status: 500, statusText: 'Internal Server Error'}) //Pass some data to our mock request, pass the data return
+
+  })
+
+  it('should find a list of lessons', () => {
+
+    coursesService.findLessons(12).subscribe(lessons => {
+      expect(lessons).withContext('No course returned').toBeTruthy()
+      expect(lessons.length).withContext('Incorrect course id').toBe(3);
+    });
+
+    const req = httpTestingController.expectOne(req => req.url == '/api/lessons')
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get("courseId")).toEqual('12');
+    expect(req.request.params.get("filter")).toEqual('');
+    expect(req.request.params.get("sortOrder")).toEqual('asc');
+    expect(req.request.params.get("pageNumber")).toEqual('0');
+    expect(req.request.params.get("pageSize")).toEqual('3');
+
+    req.flush({
+      payload: findLessonsForCourse(12).slice(0,3)
+    })
 
   })
 
